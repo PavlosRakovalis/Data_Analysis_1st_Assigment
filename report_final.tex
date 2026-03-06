@@ -1,0 +1,358 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[LGR,T1]{fontenc}
+\usepackage[greek,english]{babel}
+\usepackage{alphabeta}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    language=Python,
+    frame=single
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{AEM: 6931}
+\lhead{Data Analysis 2025-26}
+\cfoot{\thepage}
+
+\title{
+    \textbf{\textgreek{Ανάλυση Δεδομένων} 2025-26}\\[0.3cm]
+    \large \textgreek{Ερώτημα 1: Δειγματοληψία και Καθαρισμός Δεδομένων}\\[0.2cm]
+    \normalsize AEM: 6931
+}
+\author{}
+\date{\textgreek{Μάρτιος} 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{\textgreek{Εισαγωγή}}
+
+\subsection{\textgreek{Σκοπός της Εργασίας}}
+
+\textgreek{Η παρούσα εργασία αφορά την ανάλυση δεδομένων ποιότητας κρασιού. Οι στόχοι είναι:}
+
+\begin{enumerate}
+    \item \textgreek{Επιλογή τυχαίου δείγματος 80\% με seed τον ΑΕΜ}
+    \item \textgreek{Έλεγχος ποιότητας δεδομένων}
+    \item \textgreek{Καθαρισμός δεδομένων}
+\end{enumerate}
+
+\subsection{\textgreek{Τι είναι ο Καθαρισμός Δεδομένων;}}
+
+\textbf{\textgreek{Ορισμός:}} \textgreek{Ο καθαρισμός δεδομένων είναι η διαδικασία εντοπισμού και διόρθωσης λανθασμένων, ελλιπών, διπλότυπων ή ασυνεπών εγγραφών. Είναι κρίσιμο βήμα πριν από οποιαδήποτε ανάλυση.}
+
+\textgreek{Συνήθη προβλήματα:}
+\begin{itemize}
+    \item \textbf{\textgreek{Τυπογραφικά λάθη:}} \textgreek{π.χ. ``whte'' αντί ``white''}
+    \item \textbf{\textgreek{Ελλείπουσες τιμές:}} \textgreek{Κενά πεδία}
+    \item \textbf{\textgreek{Μη έγκυρες τιμές:}} \textgreek{π.χ. pH = 999}
+    \item \textbf{\textgreek{Διπλοεγγραφές:}} \textgreek{Επαναλαμβανόμενες γραμμές}
+\end{itemize}
+
+\section{\textgreek{Περιγραφή Δεδομένων}}
+
+\subsection{\textgreek{Μεταβλητές}}
+
+\textgreek{Το dataset περιέχει τις εξής μεταβλητές:}
+
+\begin{enumerate}
+    \item \textbf{Fixed acidity} - \textgreek{Σταθερή οξύτητα (g/L)}
+    \item \textbf{Volatile acidity} - \textgreek{Πτητική οξύτητα (g/L)}
+    \item \textbf{Citric acid} - \textgreek{Κιτρικό οξύ (g/L)}
+    \item \textbf{Residual sugar} - \textgreek{Υπολειμματικά σάκχαρα (g/L)}
+    \item \textbf{Chlorides} - \textgreek{Χλωριούχα άλατα (g/L)}
+    \item \textbf{Free SO2} - \textgreek{Ελεύθερο διοξείδιο του θείου (mg/L)}
+    \item \textbf{Total SO2} - \textgreek{Συνολικό διοξείδιο του θείου (mg/L)}
+    \item \textbf{Density} - \textgreek{Πυκνότητα (g/cm3)}
+    \item \textbf{pH} - \textgreek{Οξύτητα (κλίμακα 2-14)}
+    \item \textbf{Sulphates} - \textgreek{Θειικά άλατα (g/L)}
+    \item \textbf{Alcohol} - \textgreek{Περιεκτικότητα σε αλκοόλ (\%)}
+    \item \textbf{Quality} - \textgreek{Βαθμολογία ποιότητας (0-10)}
+    \item \textbf{Wine\_type} - \textgreek{Τύπος κρασιού (red ή white)}
+\end{enumerate}
+
+\textgreek{Αρχικό dataset:} \textbf{8.385} \textgreek{γραμμές} $\times$ \textbf{15} \textgreek{στήλες}
+
+\section{\textgreek{Δειγματοληψία}}
+
+\textbf{Seed = AEM = 6931} - \textgreek{Χρησιμοποιώντας τον ίδιο seed, παίρνουμε πάντα τα ίδια αποτελέσματα για αναπαραγωγιμότητα.}
+
+\begin{lstlisting}
+import pandas as pd
+
+df_original = pd.read_csv('Data Analysis_2026.csv')
+AEM = 6931
+df = df_original.sample(frac=0.80, random_state=AEM)
+df = df.reset_index(drop=True)
+\end{lstlisting}
+
+\textgreek{Αποτέλεσμα:} 8.385 $\rightarrow$ \textbf{6.708} \textgreek{γραμμές (80\%)}
+
+\section{\textgreek{Εντοπισμός Προβλημάτων}}
+
+\subsection{\textgreek{Τυπογραφικά Λάθη (wine\_type)}}
+
+\textgreek{Εντοπίστηκαν τα εξής λανθασμένα values στη στήλη wine\_type:}
+
+\begin{itemize}
+    \item ``Redd '' (75 \textgreek{εγγραφές}) $\rightarrow$ red
+    \item ``whit'' (90 \textgreek{εγγραφές}) $\rightarrow$ white
+    \item ``r3d'' (64 \textgreek{εγγραφές}) $\rightarrow$ red
+    \item ``WHITTE'' (77 \textgreek{εγγραφές}) $\rightarrow$ white
+    \item ``whate'' (39 \textgreek{εγγραφές}) $\rightarrow$ white
+    \item 999, 9999, -999, ? (215 \textgreek{εγγραφές}) $\rightarrow$ NaN
+\end{itemize}
+
+\textbf{\textgreek{Σύνολο τυπογραφικών λαθών:}} 560
+
+\subsection{\textgreek{Μη Αριθμητικές Τιμές}}
+
+\textgreek{Βρέθηκαν μη αριθμητικές τιμές (π.χ. ``abc'', ``?'', ``N/A'') στις αριθμητικές στήλες:}
+
+\begin{itemize}
+    \item fixed acidity: 87 \textgreek{μη αριθμητικές τιμές}
+    \item volatile acidity: 45
+    \item citric acid: 61
+    \item pH: 151
+    \item alcohol: 105
+    \item \textgreek{κ.ά.}
+\end{itemize}
+
+\textbf{\textgreek{Σύνολο μη αριθμητικών τιμών:}} 845
+
+\subsection{\textgreek{Αδύνατες Τιμές}}
+
+\textgreek{Τιμές όπως 999, -999, 9999 χρησιμοποιούνται συχνά ως κωδικοί για ελλείπουσες τιμές. Επίσης, κάποιες τιμές είναι εκτός λογικών ορίων (π.χ. pH = 999 ενώ το pH κυμαίνεται μεταξύ 0-14).}
+
+\textgreek{Λογικά όρια:}
+\begin{itemize}
+    \item Fixed acidity: 0-20 g/L
+    \item Volatile acidity: 0-5 g/L
+    \item pH: 2-5
+    \item Alcohol: 5-20\%
+    \item Quality: 0-10
+    \item Density: 0.9-1.1 g/cm$^3$
+\end{itemize}
+
+\textbf{\textgreek{Τιμές εκτός ορίων:}} 2.037
+
+\subsection{\textgreek{Διπλοεγγραφές}}
+
+\begin{lstlisting}
+duplicates = df.duplicated()
+print(f"Duplicates found: {duplicates.sum()}")
+\end{lstlisting}
+
+\textgreek{Εντοπίστηκαν} \textbf{1.434} \textgreek{διπλοεγγραφές.}
+
+\subsection{\textgreek{Ελλείπουσες Τιμές (Missing Values)}}
+
+\textgreek{Μετά τη μετατροπή των μη αριθμητικών και αδύνατων τιμών σε NaN, οι ελλείπουσες τιμές ανά στήλη είναι:}
+
+\begin{itemize}
+    \item fixed acidity: 574 (10.9\%)
+    \item volatile acidity: 542 (10.3\%)
+    \item density: 545 (10.3\%)
+    \item pH: 644 (12.2\%)
+    \item alcohol: 600 (11.4\%)
+    \item quality: 40 (0.8\%)
+\end{itemize}
+
+\textbf{\textgreek{Σύνολο ελλειπουσών τιμών:}} 3.092
+
+\section{\textgreek{Αντιμετώπιση Προβλημάτων}}
+
+\subsection{\textgreek{Στρατηγική Αντιμετώπισης}}
+
+\begin{enumerate}
+    \item \textbf{\textgreek{Τυπογραφικά λάθη wine\_type:}} \textgreek{Διόρθωση στη σωστή τιμή ή NaN}
+    \item \textbf{\textgreek{Μη αριθμητικές τιμές:}} \textgreek{Μετατροπή σε NaN}
+    \item \textbf{\textgreek{Αδύνατες τιμές:}} \textgreek{Μετατροπή σε NaN}
+    \item \textbf{\textgreek{Διπλοεγγραφές:}} \textgreek{Αφαίρεση}
+    \item \textbf{Missing values:} \textgreek{Συμπλήρωση με διάμεσο ανά τύπο κρασιού}
+\end{enumerate}
+
+\subsection{\textgreek{Διόρθωση Τυπογραφικών Λαθών}}
+
+\begin{lstlisting}
+corrections = {
+    'Redd ': 'red', 'r3d': 'red',
+    'WHITTE': 'white', 'whit': 'white', 'whate': 'white',
+    '999': None, '9999': None, '-999': None, '?': None
+}
+for wrong, correct in corrections.items():
+    df.loc[df['wine_type'] == wrong, 'wine_type'] = correct
+\end{lstlisting}
+
+\subsection{\textgreek{Γιατί Διάμεσος (Median) και όχι Μέσος Όρος;}}
+
+\textgreek{Η διάμεσος είναι η τιμή που χωρίζει τα δεδομένα στη μέση (50\% πάνω, 50\% κάτω). Είναι πιο ανθεκτική σε ακραίες τιμές (outliers) σε αντίθεση με τον μέσο όρο.}
+
+\textgreek{Παράδειγμα:} \textgreek{Για τιμές [1, 2, 3, 4, 100]:}
+\begin{itemize}
+    \item \textgreek{Μέσος όρος = 22 (επηρεάζεται από το 100)}
+    \item \textgreek{Διάμεσος = 3 (δεν επηρεάζεται)}
+\end{itemize}
+
+\subsection{\textgreek{Γιατί ανά Τύπο Κρασιού;}}
+
+\textgreek{Τα κόκκινα και λευκά κρασιά έχουν διαφορετικά χημικά χαρακτηριστικά:}
+
+\begin{itemize}
+    \item \textgreek{Κόκκινο - Fixed acidity (διάμεσος): 7.80}
+    \item \textgreek{Λευκό - Fixed acidity (διάμεσος): 6.80}
+    \item \textgreek{Κόκκινο - Total SO2 (διάμεσος): 40}
+    \item \textgreek{Λευκό - Total SO2 (διάμεσος): 133}
+\end{itemize}
+
+\section{\textgreek{Αποτελέσματα}}
+
+\subsection{\textgreek{Συνοπτικός Πίνακας Προβλημάτων}}
+
+\begin{enumerate}
+    \item \textgreek{Περιττές στήλες (Unnamed): 2 - Αφαιρέθηκαν}
+    \item \textgreek{Τυπογραφικά λάθη wine\_type: 560 - Διορθώθηκαν}
+    \item \textgreek{Μη αριθμητικές τιμές: 845 - Έγιναν NaN}
+    \item \textgreek{Αδύνατες τιμές: 2.037 - Έγιναν NaN}
+    \item \textgreek{Διπλοεγγραφές: 1.434 - Αφαιρέθηκαν}
+    \item \textgreek{Missing values (αρχικά): 3.092 - Συμπληρώθηκαν με διάμεσο}
+    \item \textgreek{Missing values (τελικά): 0}
+\end{enumerate}
+
+\subsection{\textgreek{Εξέλιξη Μεγέθους Dataset}}
+
+\begin{enumerate}
+    \item \textgreek{Αρχικό: 8.385 γραμμές × 15 στήλες}
+    \item \textgreek{Μετά sample (80\%): 6.708 γραμμές × 13 στήλες}
+    \item \textgreek{Μετά αφαίρεση duplicates: 5.274 γραμμές × 13 στήλες}
+    \item \textbf{\textgreek{Τελικό: 5.274 γραμμές × 13 στήλες}}
+\end{enumerate}
+
+\subsection{\textgreek{Κατανομή Τελικού Dataset}}
+
+\begin{itemize}
+    \item \textgreek{Λευκό κρασί: 3.924 (74.4\%)}
+    \item \textgreek{Κόκκινο κρασί: 1.350 (25.6\%)}
+    \item \textbf{\textgreek{Σύνολο: 5.274 (100\%)}}
+\end{itemize}
+
+\section{\textgreek{Συμπεράσματα}}
+
+\begin{enumerate}
+    \item \textgreek{Τα πραγματικά δεδομένα περιέχουν πολλαπλά προβλήματα ποιότητας}
+    \item \textgreek{Ο καθαρισμός δεδομένων είναι απαραίτητος πριν από κάθε ανάλυση}
+    \item \textgreek{Κάθε τύπος προβλήματος απαιτεί διαφορετική αντιμετώπιση}
+    \item \textgreek{Οι αποφάσεις καθαρισμού πρέπει να είναι τεκμηριωμένες}
+    \item \textgreek{Η χρήση seed εξασφαλίζει αναπαραγωγιμότητα}
+\end{enumerate}
+
+\textgreek{Το καθαρισμένο dataset αποθηκεύτηκε στο αρχείο:} \texttt{cleaned\_wine\_data\_AEM\_6931.csv}
+
+\newpage
+\appendix
+\section{\textgreek{Πλήρης Κώδικας Python}}
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+
+# Load data
+df = pd.read_csv('Data Analysis_2026 1st Case_Data.csv')
+
+# Remove unnamed columns
+unnamed = [c for c in df.columns if 'Unnamed' in c]
+df = df.drop(columns=unnamed)
+
+# Sample 80%
+AEM = 6931
+df = df.sample(frac=0.80, random_state=AEM)
+df = df.reset_index(drop=True)
+print(f"After sampling: {len(df)} rows")
+
+# Fix wine_type typos
+fixes = {
+    'Redd ':'red', 'r3d':'red', 
+    'WHITTE':'white', 'whit':'white', 'whate':'white',
+    '999':np.nan, '9999':np.nan, '-999':np.nan, '?':np.nan
+}
+for wrong, correct in fixes.items():
+    df.loc[df['wine_type']==wrong, 'wine_type'] = correct
+
+# Convert numeric columns
+num_cols = ['fixed acidity', 'volatile acidity', 
+            'citric acid', 'residual sugar', 'chlorides', 
+            'free sulfur dioxide', 'total sulfur dioxide',
+            'density', 'pH', 'sulphates', 'alcohol', 'quality']
+
+for col in num_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+# Replace impossible values with NaN
+limits = {
+    'fixed acidity': (0, 20),
+    'volatile acidity': (0, 5),
+    'citric acid': (0, 3),
+    'residual sugar': (0, 100),
+    'chlorides': (0, 1),
+    'free sulfur dioxide': (0, 300),
+    'total sulfur dioxide': (0, 500),
+    'density': (0.9, 1.1),
+    'pH': (2, 5),
+    'sulphates': (0, 3),
+    'alcohol': (5, 20),
+    'quality': (0, 10)
+}
+
+for col, (min_val, max_val) in limits.items():
+    mask = (df[col] < min_val) | (df[col] > max_val)
+    df.loc[mask, col] = np.nan
+
+# Remove duplicates
+df = df.drop_duplicates().reset_index(drop=True)
+print(f"After removing duplicates: {len(df)} rows")
+
+# Fill missing values with median by wine type
+df['wine_type'].fillna(df['wine_type'].mode()[0], inplace=True)
+
+for col in num_cols:
+    for wine in ['red', 'white']:
+        mask = (df['wine_type'] == wine) & (df[col].isna())
+        median = df.loc[df['wine_type'] == wine, col].median()
+        df.loc[mask, col] = median
+
+# Verify no missing values
+print(f"Missing values: {df.isna().sum().sum()}")
+print(f"Final shape: {df.shape}")
+
+# Save cleaned data
+df.to_csv('cleaned_wine_data_AEM_6931.csv', index=False)
+print("Saved to cleaned_wine_data_AEM_6931.csv")
+\end{lstlisting}
+
+\end{document}

@@ -1,0 +1,24 @@
+\xpg@aux {}{greek}
+\contentsline {section}{\numberline {1}Εισαγωγή}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Σκοπός της Εργασίας}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Τι είναι ο Καθαρισμός Δεδομένων;}{2}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Περιγραφή Δεδομένων}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Μεταβλητές}{2}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Δειγματοληψία}{3}{section.3}%
+\contentsline {section}{\numberline {4}Εντοπισμός Προβλημάτων}{3}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Τυπογραφικά Λάθη (wine\_type)}{3}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Μη Αριθμητικές Τιμές}{3}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Αδύνατες Τιμές}{4}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Διπλοεγγραφές}{4}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Ελλείπουσες Τιμές (Missing Values)}{4}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Αντιμετώπιση Προβλημάτων}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Στρατηγική Αντιμετώπισης}{5}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Διόρθωση Τυπογραφικών Λαθών}{5}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Γιατί Διάμεσος (Median) και όχι Μέσος Όρος;}{5}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Γιατί ανά Τύπο Κρασιού;}{5}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Αποτελέσματα}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Συνοπτικός Πίνακας Προβλημάτων}{6}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Εξέλιξη Μεγέθους Dataset}{6}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Κατανομή Τελικού Dataset}{6}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Συμπεράσματα}{6}{section.7}%
+\contentsline {section}{\numberline {\Greeknumeral {1}}Πλήρης Κώδικας Python}{7}{appendix.Alph1}%

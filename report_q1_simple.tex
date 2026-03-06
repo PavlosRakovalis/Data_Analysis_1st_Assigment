@@ -1,0 +1,409 @@
+\documentclass[12pt,a4paper]{article}
+
+% Greek language support
+\usepackage[utf8]{inputenc}
+\usepackage[LGR,T1]{fontenc}
+\usepackage[greek,english]{babel}
+\usepackage{alphabeta}
+
+% Packages
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{mdframed}
+
+% Page settings
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% Python code settings (simplified)
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    language=Python,
+    frame=single
+}
+
+% Header/footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{AEM: 6931}
+\lhead{Data Analysis 2025-26}
+\cfoot{\thepage}
+
+% Simple boxes
+\mdfdefinestyle{infobox}{linecolor=blue,linewidth=1pt,backgroundcolor=blue!5}
+\mdfdefinestyle{warnbox}{linecolor=orange,linewidth=1pt,backgroundcolor=orange!5}
+\mdfdefinestyle{okbox}{linecolor=green,linewidth=1pt,backgroundcolor=green!5}
+
+\title{
+    \textbf{\textgreek{Ανάλυση Δεδομένων} 2025-26}\\[0.3cm]
+    \large \textgreek{Ερώτημα 1: Δειγματοληψία και Καθαρισμός Δεδομένων}\\[0.2cm]
+    \normalsize AEM: 6931
+}
+\author{}
+\date{\textgreek{Μάρτιος} 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{\textgreek{Εισαγωγή}}
+
+\subsection{\textgreek{Σκοπός της Εργασίας}}
+
+\textgreek{Η παρούσα εργασία αφορά την ανάλυση δεδομένων ποιότητας κρασιού. Οι στόχοι είναι:}
+
+\begin{enumerate}
+    \item \textgreek{Επιλογή τυχαίου δείγματος 80\% με seed τον ΑΕΜ}
+    \item \textgreek{Έλεγχος ποιότητας δεδομένων}
+    \item \textgreek{Καθαρισμός δεδομένων}
+\end{enumerate}
+
+\subsection{\textgreek{Τι είναι ο Καθαρισμός Δεδομένων;}}
+
+\begin{mdframed}[style=infobox]
+\textbf{\textgreek{Ορισμός:}} \textgreek{Ο καθαρισμός δεδομένων είναι η διαδικασία εντοπισμού και διόρθωσης λανθασμένων, ελλιπών, διπλότυπων ή ασυνεπών εγγραφών. Είναι κρίσιμο βήμα πριν από οποιαδήποτε ανάλυση.}
+\end{mdframed}
+
+\textgreek{Συνήθη προβλήματα:}
+\begin{itemize}
+    \item \textbf{\textgreek{Τυπογραφικά λάθη:}} \textgreek{π.χ. ``whte'' αντί ``white''}
+    \item \textbf{\textgreek{Ελλείπουσες τιμές:}} \textgreek{Κενά πεδία}
+    \item \textbf{\textgreek{Μη έγκυρες τιμές:}} \textgreek{π.χ. pH = 999}
+    \item \textbf{\textgreek{Διπλοεγγραφές:}} \textgreek{Επαναλαμβανόμενες γραμμές}
+\end{itemize}
+
+\section{\textgreek{Περιγραφή Δεδομένων}}
+
+\subsection{\textgreek{Μεταβλητές}}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Περιγραφή μεταβλητών}}
+\begin{tabular}{clp{6cm}}
+\toprule
+\textbf{A/A} & \textbf{\textgreek{Μεταβλητή}} & \textbf{\textgreek{Περιγραφή}} \\
+\midrule
+1 & Fixed acidity & \textgreek{Σταθερή οξύτητα (g/L)} \\
+2 & Volatile acidity & \textgreek{Πτητική οξύτητα (g/L)} \\
+3 & Citric acid & \textgreek{Κιτρικό οξύ (g/L)} \\
+4 & Residual sugar & \textgreek{Υπολειμματικά σάκχαρα (g/L)} \\
+5 & Chlorides & \textgreek{Χλωριούχα άλατα (g/L)} \\
+6 & Free SO2 & \textgreek{Ελεύθερο SO2 (mg/L)} \\
+7 & Total SO2 & \textgreek{Συνολικό SO2 (mg/L)} \\
+8 & Density & \textgreek{Πυκνότητα (g/cm3)} \\
+9 & pH & \textgreek{Οξύτητα (2-14)} \\
+10 & Sulphates & \textgreek{Θειικά άλατα (g/L)} \\
+11 & Alcohol & \textgreek{Αλκοόλ (\%)} \\
+12 & Quality & \textgreek{Βαθμολογία (0-10)} \\
+13 & Wine\_type & \textgreek{red ή white} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textgreek{Αρχικό dataset:} \textbf{8.385} \textgreek{γραμμές} $\times$ \textbf{15} \textgreek{στήλες}
+
+\section{\textgreek{Δειγματοληψία}}
+
+\begin{mdframed}[style=warnbox]
+\textbf{Seed:} \textgreek{Χρησιμοποιώντας τον ίδιο seed (ΑΕΜ=6931), παίρνουμε πάντα τα ίδια αποτελέσματα για αναπαραγωγιμότητα.}
+\end{mdframed}
+
+\begin{lstlisting}
+import pandas as pd
+
+df_original = pd.read_csv('Data Analysis_2026.csv')
+AEM = 6931
+df = df_original.sample(frac=0.80, random_state=AEM)
+df = df.reset_index(drop=True)
+\end{lstlisting}
+
+\textgreek{Αποτέλεσμα:} 8.385 $\rightarrow$ \textbf{6.708} \textgreek{γραμμές (80\%)}
+
+\section{\textgreek{Εντοπισμός Προβλημάτων}}
+
+\subsection{\textgreek{Τυπογραφικά Λάθη (wine\_type)}}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Λάθη στη στήλη wine\_type}}
+\begin{tabular}{lcc}
+\toprule
+\textbf{\textgreek{Λανθασμένη}} & \textbf{\textgreek{Πλήθος}} & \textbf{\textgreek{Σωστή}} \\
+\midrule
+Redd  & 75 & red \\
+whit & 90 & white \\
+r3d & 64 & red \\
+WHITTE & 77 & white \\
+whate & 39 & white \\
+999, 9999, -999, ? & 215 & NaN \\
+\midrule
+\textbf{\textgreek{Σύνολο}} & \textbf{560} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textgreek{Μη Αριθμητικές Τιμές}}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Μη αριθμητικές τιμές ανά στήλη}}
+\begin{tabular}{lc|lc}
+\toprule
+\textbf{\textgreek{Μεταβλητή}} & \textbf{N} & \textbf{\textgreek{Μεταβλητή}} & \textbf{N} \\
+\midrule
+fixed acidity & 87 & density & 53 \\
+volatile acidity & 45 & pH & 151 \\
+citric acid & 61 & sulphates & 63 \\
+residual sugar & 56 & alcohol & 105 \\
+chlorides & 57 & quality & 58 \\
+free SO2 & 56 & & \\
+total SO2 & 53 & \textbf{\textgreek{Σύνολο}} & \textbf{845} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textgreek{Αδύνατες Τιμές}}
+
+\textgreek{Τιμές 999, -999, 9999 εμφανίζονται ως κωδικοί ελλειπουσών τιμών.}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Λογικά όρια τιμών}}
+\begin{tabular}{lcc|lcc}
+\toprule
+\textbf{\textgreek{Μεταβλητή}} & \textbf{Min} & \textbf{Max} & \textbf{\textgreek{Μεταβλητή}} & \textbf{Min} & \textbf{Max} \\
+\midrule
+Fixed acidity & 0 & 20 & Density & 0.9 & 1.1 \\
+Volatile acidity & 0 & 5 & pH & 2 & 5 \\
+Citric acid & 0 & 3 & Sulphates & 0 & 3 \\
+Residual sugar & 0 & 100 & Alcohol & 5 & 20 \\
+Chlorides & 0 & 1 & Quality & 0 & 10 \\
+Free SO2 & 0 & 300 & & & \\
+Total SO2 & 0 & 500 & & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textgreek{Εκτός ορίων:} \textbf{2.037} \textgreek{τιμές}
+
+\subsection{\textgreek{Διπλοεγγραφές}}
+
+\begin{lstlisting}
+duplicates = df.duplicated()
+print(f"Duplicates: {duplicates.sum()}")
+\end{lstlisting}
+
+\begin{mdframed}[style=okbox]
+\textgreek{Εντοπίστηκαν} \textbf{1.434} \textgreek{διπλοεγγραφές}
+\end{mdframed}
+
+\subsection{\textgreek{Ελλείπουσες Τιμές}}
+
+\begin{table}[H]
+\centering
+\caption{Missing values}
+\begin{tabular}{lcc|lcc}
+\toprule
+\textbf{\textgreek{Μεταβλητή}} & \textbf{N} & \textbf{\%} & \textbf{\textgreek{Μεταβλητή}} & \textbf{N} & \textbf{\%} \\
+\midrule
+fixed acidity & 574 & 10.9 & pH & 644 & 12.2 \\
+volatile acidity & 542 & 10.3 & sulphates & 1 & 0.0 \\
+density & 545 & 10.3 & alcohol & 600 & 11.4 \\
+residual sugar & 134 & 2.5 & quality & 40 & 0.8 \\
+\midrule
+\multicolumn{3}{c}{} & \textbf{\textgreek{Σύνολο}} & \textbf{3.092} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{\textgreek{Αντιμετώπιση Προβλημάτων}}
+
+\subsection{\textgreek{Στρατηγική}}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Στρατηγική αντιμετώπισης}}
+\begin{tabular}{lp{7cm}}
+\toprule
+\textbf{\textgreek{Πρόβλημα}} & \textbf{\textgreek{Αντιμετώπιση}} \\
+\midrule
+\textgreek{Τυπογραφικά λάθη} & \textgreek{Διόρθωση ή NaN} \\
+\textgreek{Μη αριθμητικές} & \textgreek{Μετατροπή σε NaN} \\
+\textgreek{Αδύνατες τιμές} & \textgreek{Μετατροπή σε NaN} \\
+\textgreek{Διπλοεγγραφές} & \textgreek{Αφαίρεση} \\
+Missing values & \textgreek{Συμπλήρωση με διάμεσο ανά τύπο κρασιού} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textgreek{Διόρθωση Τυπογραφικών}}
+
+\begin{lstlisting}
+corrections = {
+    'Redd ': 'red', 'r3d': 'red',
+    'WHITTE': 'white', 'whit': 'white',
+    '999': None, '-999': None
+}
+for wrong, correct in corrections.items():
+    df.loc[df['wine_type'] == wrong, 'wine_type'] = correct
+\end{lstlisting}
+
+\subsection{\textgreek{Γιατί Διάμεσος;}}
+
+\begin{mdframed}[style=infobox]
+\textgreek{Η διάμεσος είναι ανθεκτική σε ακραίες τιμές, σε αντίθεση με τον μέσο όρο. Υπολογίζεται ξεχωριστά για κόκκινα και λευκά κρασιά λόγω διαφορετικών χημικών χαρακτηριστικών.}
+\end{mdframed}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Διάμεσοι ανά τύπο}}
+\begin{tabular}{lcc}
+\toprule
+\textbf{\textgreek{Μεταβλητή}} & \textbf{\textgreek{Κόκκινο}} & \textbf{\textgreek{Λευκό}} \\
+\midrule
+Fixed acidity & 7.80 & 6.80 \\
+Volatile acidity & 0.50 & 0.26 \\
+Total SO2 & 40 & 133 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{\textgreek{Αποτελέσματα}}
+
+\subsection{\textgreek{Σύνοψη Προβλημάτων}}
+
+\begin{table}[H]
+\centering
+\caption{\textgreek{Συνοπτικός πίνακας}}
+\begin{tabular}{lcc}
+\toprule
+\textbf{\textgreek{Πρόβλημα}} & \textbf{\textgreek{Πλήθος}} & \textbf{\textgreek{Αντιμετώπιση}} \\
+\midrule
+\textgreek{Περιττές στήλες} & 2 & \textgreek{Αφαίρεση} \\
+\textgreek{Τυπογραφικά wine\_type} & 560 & \textgreek{Διόρθωση} \\
+\textgreek{Μη αριθμητικές} & 845 & NaN \\
+\textgreek{Αδύνατες τιμές} & 2.037 & NaN \\
+\textgreek{Διπλοεγγραφές} & 1.434 & \textgreek{Αφαίρεση} \\
+Missing (\textgreek{αρχικά}) & 3.092 & \textgreek{Διάμεσος} \\
+Missing (\textgreek{τελικά}) & 0 & - \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textgreek{Μέγεθος Dataset}}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{\textgreek{Στάδιο}} & \textbf{\textgreek{Γραμμές}} & \textbf{\textgreek{Στήλες}} \\
+\midrule
+\textgreek{Αρχικό} & 8.385 & 15 \\
+\textgreek{Μετά sample (80\%)} & 6.708 & 13 \\
+\textgreek{Μετά duplicates} & 5.274 & 13 \\
+\textbf{\textgreek{Τελικό}} & \textbf{5.274} & \textbf{13} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{\textgreek{Κατανομή Τελικού}}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{\textgreek{Τύπος}} & \textbf{\textgreek{Πλήθος}} & \textbf{\%} \\
+\midrule
+\textgreek{Λευκό} & 3.924 & 74.4 \\
+\textgreek{Κόκκινο} & 1.350 & 25.6 \\
+\midrule
+\textbf{\textgreek{Σύνολο}} & \textbf{5.274} & \textbf{100} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{\textgreek{Συμπεράσματα}}
+
+\begin{enumerate}
+    \item \textgreek{Τα πραγματικά δεδομένα περιέχουν πολλαπλά προβλήματα}
+    \item \textgreek{Ο καθαρισμός είναι απαραίτητος πριν την ανάλυση}
+    \item \textgreek{Κάθε πρόβλημα απαιτεί διαφορετική αντιμετώπιση}
+    \item \textgreek{Οι αποφάσεις πρέπει να είναι τεκμηριωμένες}
+\end{enumerate}
+
+\textgreek{Το καθαρισμένο dataset είναι έτοιμο για περαιτέρω ανάλυση.}
+
+\newpage
+\appendix
+\section{\textgreek{Πλήρης Κώδικας}}
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+
+# Load and sample
+df = pd.read_csv('Data Analysis_2026.csv')
+unnamed = [c for c in df.columns if 'Unnamed' in c]
+df = df.drop(columns=unnamed)
+df = df.sample(frac=0.80, random_state=6931).reset_index(drop=True)
+
+# Fix wine_type typos
+fixes = {'Redd ':'red', 'r3d':'red', 'WHITTE':'white', 
+         'whit':'white', 'whate':'white',
+         '999':np.nan, '9999':np.nan, '-999':np.nan, '?':np.nan}
+for w, c in fixes.items():
+    df.loc[df['wine_type']==w, 'wine_type'] = c
+
+# Convert to numeric
+num_cols = ['fixed acidity', 'volatile acidity', 'citric acid',
+            'residual sugar', 'chlorides', 'free sulfur dioxide',
+            'total sulfur dioxide', 'density', 'pH', 'sulphates',
+            'alcohol', 'quality']
+for col in num_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+# Replace impossible values
+limits = {'fixed acidity':(0,20), 'volatile acidity':(0,5),
+          'citric acid':(0,3), 'residual sugar':(0,100),
+          'chlorides':(0,1), 'free sulfur dioxide':(0,300),
+          'total sulfur dioxide':(0,500), 'density':(0.9,1.1),
+          'pH':(2,5), 'sulphates':(0,3), 'alcohol':(5,20),
+          'quality':(0,10)}
+for col, (mn, mx) in limits.items():
+    df.loc[(df[col]<mn)|(df[col]>mx), col] = np.nan
+
+# Remove duplicates
+df = df.drop_duplicates().reset_index(drop=True)
+
+# Fill missing values with median by wine type
+df['wine_type'].fillna(df['wine_type'].mode()[0], inplace=True)
+for col in num_cols:
+    for wt in ['red','white']:
+        mask = (df['wine_type']==wt) & df[col].isna()
+        med = df.loc[df['wine_type']==wt, col].median()
+        df.loc[mask, col] = med
+
+# Save
+df.to_csv('cleaned_wine_data_AEM_6931.csv', index=False)
+\end{lstlisting}
+
+\end{document}
